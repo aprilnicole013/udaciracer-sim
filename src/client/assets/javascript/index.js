@@ -321,6 +321,9 @@ function defaultFetchOpts() {
 
 function getTracks() {
 	// GET request to `${SERVER}/api/tracks`
+	fetch(`${SERVER}/api/tracks`)
+		.then(res => res.json())
+		.then(trackData => console.log(trackData))
 }
 
 function getRacers() {
