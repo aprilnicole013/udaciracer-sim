@@ -146,6 +146,7 @@ function handleSelectPodRacer(target) {
 	// TODO - save the selected racer to the store
 	store.race_id = target.id
 	store.player_id = target.id
+	store.race_id = target.id
 	console.log(store)
 }
 
