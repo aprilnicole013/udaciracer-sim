@@ -55,7 +55,7 @@ function setupClickHandlers() {
 		}
 
 		// Handle acceleration click
-		if (target.matches('#gas-peddle')) {
+		if (target.matches('#gas-pedal')) {
 			handleAccelerate(target)
 		}
 
@@ -147,6 +147,7 @@ function handleSelectPodRacer(target) {
 	store.race_id = target.id
 	store.player_id = target.id
 	store.race_id = target.id
+	
 	console.log(store)
 }
 
@@ -161,8 +162,9 @@ function handleSelectTrack(target) {
 
 	// add class selected to current target
 	target.classList.add('selected')
-
 	// TODO - save the selected track id to the store
+	store.track_id = target.id
+	console.log(store)
 	
 }
 
@@ -249,7 +251,7 @@ function renderRaceStartView(track, racers) {
 			<section id="accelerate">
 				<h2>Directions</h2>
 				<p>Click the button as fast as you can to make your racer go faster!</p>
-				<button id="gas-peddle">Click Me To Win!</button>
+				<button id="gas-pedal">Click Me To Win!</button>
 			</section>
 		</main>
 		<footer></footer>
@@ -343,7 +345,7 @@ function createRace(player_id, track_id) {
 	return fetch(`${SERVER}/api/races`, {
 		method: 'POST',
 		...defaultFetchOpts(),
-		dataType: 'jsonp',
+		dataType: 'json',
 		body: JSON.stringify(body)
 	})
 	.then(res => res.json())
