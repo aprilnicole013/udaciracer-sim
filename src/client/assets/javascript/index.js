@@ -143,12 +143,14 @@ function handleSelectPodRacer(target) {
 
 	// add class selected to current target
 	target.classList.add('selected')
-
+	store.race_id = target.id
+	console.log(store)
 	// TODO - save the selected racer to the store
+	
 }
 
 function handleSelectTrack(target) {
-	console.log("selected a track", target.id)
+	target.classList.add('selected')
 
 	// remove class selected from all track options
 	const selected = document.querySelector('#tracks .selected')
@@ -348,9 +350,9 @@ function createRace(player_id, track_id) {
 }
 
 function getRace(id) {
-	return fetch(`${SERVER}/api/races/${id}`)
-		.then(res => res.json())
-		.catch((error) => console.log("Error", error))
+	// return fetch(`${SERVER}/api/races/${id}`)
+	// 	.then(res => res.json())
+	// 	.catch((error) => console.log("Error", error))
 }
 
 function startRace(id) {
