@@ -5,6 +5,7 @@ var store = {
 	track_id: undefined,
 	player_id: undefined,
 	race_id: undefined,
+	tracks: undefined
 }
 
 // We need our javascript to wait until the DOM is loaded
@@ -19,6 +20,8 @@ async function onPageLoad() {
 			.then(tracks => {
 				const html = renderTrackCards(tracks)
 				renderAt('#tracks', html)
+				store.tracks = tracks
+				console.log(store)
 			})
 
 		getRacers()
@@ -74,21 +77,18 @@ async function delay(ms) {
 
 // This async function controls the flow of the race, add the logic and error handling
 async function handleCreateRace() {
-	// render starting UI
-	renderAt('#race', renderRaceStartView())
-
-	// TODO - Get player_id and track_id from the store
+	let { track_id, player_id, track_name} = store;
+	const race = await createRace(track_id, player_id);
+	renderAt('#race', renderRaceStartView(track_name))
 	
-	// const race = TODO - invoke the API call to create the race, then save the result
+	store.race_id = race.id;
+	console.log(store)
+	
+	await runCountdown()
+	
+	await startRace()
 
-	// TODO - update the store with the race id
-
-	// The race has been created, now start the countdown
-	// TODO - call the async function runCountdown
-
-	// TODO - call the async function startRace
-
-	// TODO - call the async function runRace
+	await runRace()
 }
 
 function runRace(raceID) {
@@ -133,8 +133,6 @@ async function runCountdown() {
 }
 
 function handleSelectPodRacer(target) {
-	console.log("selected a pod", target.id)
-
 	// remove class selected from all racer options
 	const selected = document.querySelector('#racers .selected')
 	if(selected) {
@@ -144,16 +142,11 @@ function handleSelectPodRacer(target) {
 	// add class selected to current target
 	target.classList.add('selected')
 	// TODO - save the selected racer to the store
-	store.race_id = target.id
 	store.player_id = target.id
-	store.race_id = target.id
-	
 	console.log(store)
 }
 
 function handleSelectTrack(target) {
-	target.classList.add('selected')
-
 	// remove class selected from all track options
 	const selected = document.querySelector('#tracks .selected')
 	if(selected) {
@@ -164,6 +157,8 @@ function handleSelectTrack(target) {
 	target.classList.add('selected')
 	// TODO - save the selected track id to the store
 	store.track_id = target.id
+	store.track_id = target.id
+	store.track_name = store.tracks[store.track_id -1].name
 	console.log(store)
 	
 }
@@ -238,10 +233,10 @@ function renderCountdown(count) {
 	`
 }
 
-function renderRaceStartView(track, racers) {
+function renderRaceStartView(track_name) {
 	return `
 		<header>
-			<h1>Race: ${track.name}</h1>
+			<h1>Race: ${track_name}</h1>
 		</header>
 		<main id="two-columns">
 			<section id="leaderBoard">
@@ -321,8 +316,6 @@ function defaultFetchOpts() {
 		},
 	}
 }
-
-// TODO - Make a fetch call (with error handling!) to each of the following API endpoints 
 
 function getTracks() {
 	return fetch(`${SERVER}/api/tracks`)
