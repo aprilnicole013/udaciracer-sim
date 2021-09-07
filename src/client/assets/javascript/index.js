@@ -21,7 +21,6 @@ async function onPageLoad() {
 				const html = renderTrackCards(tracks)
 				renderAt('#tracks', html)
 				store.tracks = tracks
-				console.log(store)
 			})
 
 		getRacers()
@@ -118,17 +117,18 @@ async function runCountdown() {
 		await delay(1000)
 		let timer = 3
 
-		return new Promise(resolve => {
-			// TODO - use Javascript's built in setInterval method to count down once per second
-
-			// run this DOM manipulation to decrement the countdown for the user
-			document.getElementById('big-numbers').innerHTML = --timer
-
-			// TODO - if the countdown is done, clear the interval, resolve the promise, and return
-
-		})
-	} catch(error) {
-		console.log(error);
+		return new Promise((resolve) => {
+			const interval = setInterval(() => {
+			  document.getElementById("big-numbers").innerHTML = --timer;
+			  if (timer === 0) {
+				clearInterval(interval);
+				resolve();
+				return;
+			  }
+			}, 1000);
+		  });
+		} catch (error) {
+		  console.log(error);
 	}
 }
 
