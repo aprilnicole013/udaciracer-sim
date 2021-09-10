@@ -37,15 +37,16 @@ async function onPageLoad() {
 function setupClickHandlers() {
 	document.addEventListener('click', function(event) {
 		const { target } = event
+		const parent = event.target.parentElement
 
 		// Race track form field
-		if (target.matches('.card.track')) {
-			handleSelectTrack(target)
+		if (parent.matches('.card.track')) {
+			handleSelectTrack(parent)
 		}
 
 		// Podracer form field
-		if (target.matches('.card.podracer')) {
-			handleSelectPodRacer(target)
+		if (parent.matches('.card.podracer')) {
+			handleSelectPodRacer(parent)
 		}
 
 		// Submit create race form
@@ -79,41 +80,38 @@ async function handleCreateRace() {
 	let { track_id, player_id, track_name} = store;
 	const race = await createRace(track_id, player_id);
 	renderAt('#race', renderRaceStartView(track_name))
-	
-	store.race_id = race.id;
-	console.log(store)
+	store.race_id = race.ID;
 	
 	await runCountdown()
 	
-	await startRace()
+	await startRace(store.race_id)
 
-	await runRace()
+	await runRace(store.race_id)
 }
 
-function runRace(raceID) {
-	return new Promise(resolve => {
-	// TODO - use Javascript's built in setInterval method to get race info every 500ms
-
-	/* 
-		TODO - if the race info status property is "in-progress", update the leaderboard by calling:
-
-		renderAt('#leaderBoard', raceProgress(res.positions))
-	*/
-
-	/* 
-		TODO - if the race info status property is "finished", run the following:
-
-		clearInterval(raceInterval) // to stop the interval from repeating
-		renderAt('#race', resultsView(res.positions)) // to render the results view
-		reslove(res) // resolve the promise
-	*/
-	})
-	// remember to add error handling for the Promise
+async function runRace(raceID) {
+	try {
+		return new Promise ((resolve) => {
+			const raceInterval = setInterval(() => {
+				let data = getRace(raceID);
+				if (data.status == "in-progress"){
+					renderAt('#leaderBoard', raceProgress(data.positions))
+				}
+				if (data.status == "finished"){
+					clearInterval(raceInterval)
+					renderAt('#race', resultsView(data.positions))
+					resolve(data)
+				}	
+			}, 5000);
+		});
+	 } catch(error) {
+			console.log(error);
+	 }
 }
+	
 
 async function runCountdown() {
 	try {
-		// wait for the DOM to load
 		await delay(1000)
 		let timer = 3
 
@@ -346,9 +344,9 @@ function createRace(player_id, track_id) {
 }
 
 function getRace(id) {
-	// return fetch(`${SERVER}/api/races/${id}`)
-	// 	.then(res => res.json())
-	// 	.catch((error) => console.log("Error", error))
+	return fetch(`${SERVER}/api/races/${id}`)
+		.then(res => res.json())
+		.catch((error) => console.log("Error", error))
 }
 
 function startRace(id) {
