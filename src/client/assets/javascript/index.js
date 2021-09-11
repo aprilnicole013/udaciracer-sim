@@ -1,6 +1,3 @@
-// PROVIDED CODE BELOW (LINES 1 - 80) DO NOT REMOVE
-
-// The store will hold all information needed globally
 var store = {
 	track_id: undefined,
 	player_id: undefined,
@@ -8,7 +5,6 @@ var store = {
 	tracks: undefined
 }
 
-// We need our javascript to wait until the DOM is loaded
 document.addEventListener("DOMContentLoaded", function() {
 	onPageLoad()
 	setupClickHandlers()
@@ -79,21 +75,20 @@ async function delay(ms) {
 async function handleCreateRace() {
 	let { track_id, player_id, track_name} = store;
 	const race = await createRace(track_id, player_id);
+
 	renderAt('#race', renderRaceStartView(track_name))
-	store.race_id = race.ID;
+	store.race_id = race.ID - 1;
 	
 	await runCountdown()
-	
 	await startRace(store.race_id)
-
 	await runRace(store.race_id)
 }
 
-async function runRace(raceID) {
+function runRace(raceID) {
 	try {
 		return new Promise ((resolve) => {
-			const raceInterval = setInterval(() => {
-				let data = getRace(raceID);
+			const raceInterval = setInterval(async () => {
+				let data = await getRace(raceID);
 				if (data.status == "in-progress"){
 					renderAt('#leaderBoard', raceProgress(data.positions))
 				}
@@ -141,7 +136,6 @@ function handleSelectPodRacer(target) {
 	target.classList.add('selected')
 	// TODO - save the selected racer to the store
 	store.player_id = target.id
-	console.log(store)
 }
 
 function handleSelectTrack(target) {
@@ -155,9 +149,7 @@ function handleSelectTrack(target) {
 	target.classList.add('selected')
 	// TODO - save the selected track id to the store
 	store.track_id = target.id
-	store.track_id = target.id
 	store.track_name = store.tracks[store.track_id -1].name
-	console.log(store)
 	
 }
 
@@ -265,8 +257,12 @@ function resultsView(positions) {
 	`
 }
 
+let apples = {1: "apples", 2: "oranges"}
+
+
 function raceProgress(positions) {
-	let userPlayer = positions.find(e => e.id === store.player_id)
+	console.log(positions)
+	let userPlayer = positions[store.player_id - 1]
 	userPlayer.driver_name += " (you)"
 
 	positions = positions.sort((a, b) => (a.segment > b.segment) ? -1 : 1)
@@ -332,7 +328,7 @@ function createRace(player_id, track_id) {
 	player_id = parseInt(player_id)
 	track_id = parseInt(track_id)
 	const body = { player_id, track_id }
-	
+
 	return fetch(`${SERVER}/api/races`, {
 		method: 'POST',
 		...defaultFetchOpts(),
@@ -354,12 +350,13 @@ function startRace(id) {
 		method: 'POST',
 		...defaultFetchOpts(),
 	})
-	.then(res => res.json())
 	.catch(err => console.log("Problem with getRace request::", err))
 }
 
 function accelerate(id) {
-	// POST request to `${SERVER}/api/races/${id}/accelerate`
-	// options parameter provided as defaultFetchOpts
-	// no body or datatype needed for this request
+	return fetch(`${SERVER}/api/races/${id}/accelerate`, {
+		method: 'POST',
+		...defaultFetchOpts(),
+	})
+	.catch(err => console.log("Problem with acceleration", err))
 }
