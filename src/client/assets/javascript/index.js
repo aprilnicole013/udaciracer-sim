@@ -75,13 +75,18 @@ async function delay(ms) {
 async function handleCreateRace() {
 	let { track_id, player_id, track_name} = store;
 	const race = await createRace(track_id, player_id);
-
-	renderAt('#race', renderRaceStartView(track_name))
-	store.race_id = race.ID - 1;
+	if (!player_id || !track_id){
+		alert('Must select a track and a race')
+	}else{
+		renderAt('#race', renderRaceStartView(track_name))
+		store.race_id = race.ID - 1;
 	
-	await runCountdown()
-	await startRace(store.race_id)
-	await runRace(store.race_id)
+		await runCountdown()
+		await startRace(store.race_id)
+		await runRace(store.race_id)
+	}
+	
+	
 }
 
 function runRace(raceID) {
@@ -103,7 +108,6 @@ function runRace(raceID) {
 			console.log(error);
 	 }
 }
-	
 
 async function runCountdown() {
 	try {
@@ -155,7 +159,7 @@ function handleSelectTrack(target) {
 
 function handleAccelerate() {
 	console.log("accelerate button clicked")
-	// TODO - Invoke the API call to accelerate
+	accelerate(store.race_id)
 }
 
 // HTML VIEWS ------------------------------------------------
