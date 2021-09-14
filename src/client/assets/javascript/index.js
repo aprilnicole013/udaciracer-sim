@@ -1,4 +1,4 @@
-var store = {
+let store = {
 	track_id: undefined,
 	player_id: undefined,
 	race_id: undefined,
@@ -41,8 +41,12 @@ function setupClickHandlers() {
 			handleSelectTrack(parent)
 		}
 
-		if (parent.matches('.card.podracer')) {
+		if (target.matches('.card.podracer')) {
 			handleSelectPodRacer(parent)
+		}
+
+		if (target.matches('card.track')) {
+			handleSelectTrack(target)
 		}
 
 		if (target.matches('#submit-create-race')) {
@@ -66,7 +70,6 @@ async function delay(ms) {
 		console.log(error)
 	}
 }
-// ^ PROVIDED CODE ^ DO NOT REMOVE
 
 async function handleCreateRace() {
 	let {
@@ -155,9 +158,6 @@ function handleAccelerate() {
 	accelerate(store.race_id)
 }
 
-// HTML VIEWS ------------------------------------------------
-// Provided code - do not remove
-
 function renderRacerCars(racers) {
 	if (!racers.length) {
 		return `
@@ -186,9 +186,9 @@ function renderRacerCard(racer) {
 	return `
 		<li class="card podracer" id="${id}">
 			<h3>${driver_name}</h3>
-			<p>${top_speed}</p>
-			<p>${acceleration}</p>
-			<p>${handling}</p>
+			<p>Top Speed: ${top_speed}</p>
+			<p>Acceleration: ${acceleration}</p>
+			<p>Handling: ${handling}</p>
 		</li>
 	`
 }
@@ -238,7 +238,6 @@ function renderRaceStartView(track_name) {
 			<section id="leaderBoard">
 				${renderCountdown(3)}
 			</section>
-
 			<section id="accelerate">
 				<h2>Directions</h2>
 				<p>Click the button as fast as you can to make your racer go faster!</p>
@@ -295,11 +294,6 @@ function renderAt(element, html) {
 
 	node.innerHTML = html
 }
-
-// ^ Provided code ^ do not remove
-
-
-// API CALLS ------------------------------------------------
 
 const SERVER = 'http://localhost:8000'
 
