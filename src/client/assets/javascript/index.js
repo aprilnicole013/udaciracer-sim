@@ -44,11 +44,12 @@ function setupClickHandlers() {
 		if (target.matches('.card.podracer')) {
 			handleSelectPodRacer(parent)
 		}
-
-		if (target.matches('card.track')) {
+		if (target.matches('.card.track')) {
 			handleSelectTrack(target)
 		}
-
+		if (target.matches('.card.podracer')) {
+			handleSelectPodRacer(target)
+		}
 		if (target.matches('#submit-create-race')) {
 			event.preventDefault()
 
@@ -72,11 +73,12 @@ async function delay(ms) {
 }
 
 async function handleCreateRace() {
-	let {
+	const {
 		track_id,
 		player_id,
 		track_name
 	} = store;
+
 	const race = await createRace(track_id, player_id);
 	if (!player_id || !track_id) {
 		alert('Must select a track and a race')
@@ -96,7 +98,7 @@ function runRace(raceID) {
 	try {
 		return new Promise((resolve) => {
 			const raceInterval = setInterval(async () => {
-				let data = await getRace(raceID);
+				const data = await getRace(raceID);
 				if (data.status == "in-progress") {
 					renderAt('#leaderBoard', raceProgress(data.positions))
 				}
@@ -263,7 +265,7 @@ function resultsView(positions) {
 }
 
 function raceProgress(positions) {
-	let userPlayer = positions[store.player_id - 1]
+	const userPlayer = positions[store.player_id - 1]
 	userPlayer.driver_name += " (you)"
 
 	positions = positions.sort((a, b) => (a.segment > b.segment) ? -1 : 1)
