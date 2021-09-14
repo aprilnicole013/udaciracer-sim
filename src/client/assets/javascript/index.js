@@ -91,7 +91,6 @@ async function handleCreateRace() {
 		await runRace(store.race_id)
 	}
 
-
 }
 
 function runRace(raceID) {
