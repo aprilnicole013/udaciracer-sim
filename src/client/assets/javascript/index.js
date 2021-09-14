@@ -2,7 +2,8 @@ let store = {
 	track_id: undefined,
 	player_id: undefined,
 	race_id: undefined,
-	tracks: undefined
+	tracks: undefined,
+	status: undefined,
 }
 
 document.addEventListener("DOMContentLoaded", function () {
@@ -41,7 +42,7 @@ function setupClickHandlers() {
 			handleSelectTrack(parent)
 		}
 
-		if (target.matches('.card.podracer')) {
+		if (parent.matches('.card.podracer')) {
 			handleSelectPodRacer(parent)
 		}
 		if (target.matches('.card.track')) {
@@ -52,7 +53,6 @@ function setupClickHandlers() {
 		}
 		if (target.matches('#submit-create-race')) {
 			event.preventDefault()
-
 			handleCreateRace()
 		}
 
@@ -84,11 +84,12 @@ async function handleCreateRace() {
 		alert('Must select a track and a race')
 	} else {
 		renderAt('#race', renderRaceStartView(track_name))
+		store.status = race.Results.status
 		store.race_id = race.ID - 1;
 
 		await runCountdown()
 		await startRace(store.race_id)
-		await runRace(store.race_id)
+		await runRace(store.race_id, store.status)
 	}
 
 }
@@ -98,15 +99,16 @@ function runRace(raceID) {
 		return new Promise((resolve) => {
 			const raceInterval = setInterval(async () => {
 				const data = await getRace(raceID);
-				if (data.status == "in-progress") {
+				resolve(data)
+				if (data.status === "in-progress") {
 					renderAt('#leaderBoard', raceProgress(data.positions))
 				}
-				if (data.status == "finished") {
+				if (data.status === "finished") {
 					clearInterval(raceInterval)
 					renderAt('#race', resultsView(data.positions))
 					resolve(data)
 				}
-			}, 5000);
+			}, 500);
 		});
 	} catch (error) {
 		console.log(error);
