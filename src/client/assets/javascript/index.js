@@ -1,4 +1,4 @@
-let store = {
+const store = {
 	track_id: undefined,
 	player_id: undefined,
 	race_id: undefined,
